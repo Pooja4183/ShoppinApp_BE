@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const Product = require("../models/productModel");
+const { isValidObjectId } = require("mongoose");
 
 exports.addProducts = async (req, res, next) => {
   try {
@@ -73,7 +74,7 @@ exports.getProducts = async (req, res, next) => {
       {
         $unwind: {
           path: "$brandDetails",
-          preserveNullAndEmptyArrays: true,
+          preserveNullAndEmptyArrays: true, 
         },
       },
       // join the color
@@ -107,13 +108,21 @@ exports.getProducts = async (req, res, next) => {
 };
 
 exports.getProductsById = async (req, res, next) => {
+  const id = req.params.id;
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({
+      message: "Invalid product ID",
+      success: false,
+    });
+  }
+
   try {
     //findById is a shortcut for findOne({ _id: req.params.id }).
     // const product = await Product.findById(req.params.id);
     const product = await Product.aggregate([
       {
         $match: {
-          _id: new mongoose.Types.ObjectId.createFromHexString(req.params.id),
+          _id: new mongoose.Types.ObjectId(id),
         },
       },
       {
@@ -128,7 +137,7 @@ exports.getProductsById = async (req, res, next) => {
         $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true },
       },
     ]);
-    if (!product) {
+    if (!product.length) {
       const error = new Error("Product not found");
       error.statusCode = 404;
       return next(error);
@@ -212,5 +221,107 @@ exports.checkProductExists = async (req, res, next) => {
     res.status(200).json({ exists: !!exists });
   } catch (error) {
     next(error);
+  }
+};
+
+// get product by search querry
+exports.getProductsBySearch = async (req, res, next) => {
+  const { query } = req.query; // // Get search query from URL parameter (only value )
+  if (!query) {
+    return res
+      .status(400)
+      .json({ message: "Search query is required", success: false });
+  }
+  try {
+    const data = await Product.find({
+      // Case-insensitive search on 'name' field
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
+      ],
+    });
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//
+
+exports.getFilteredCategoryProducts = async (req, res, next) => {
+  try {
+    const { categoryName } = req.params;
+
+    const { brand, color, minPrice, maxPrice, category } = req.query;
+
+    const min = minPrice ? parseInt(minPrice) : 0;     // default 0 if minPrice not sent
+    const max = maxPrice ? parseInt(maxPrice) : Infinity; // default Infinity if maxPrice not sent
+
+
+    const match = {};
+
+    const filteredProducts = await Product.aggregate([
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryDetails",
+        },
+      },
+
+      { $unwind: "$categoryDetails" },
+
+      // join the brand
+      {
+        $lookup: {
+          from: "brands",
+          localField: "brand",
+          foreignField: "_id",
+          as: "brandDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$brandDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      // join the color
+      {
+        $lookup: {
+          from: "colors",
+          localField: "color",
+          foreignField: "_id",
+          as: "colorDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$colorDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+       // Filter by categoryName, brand, color, price
+       {
+        $match: {
+          ...(category ? { "categoryDetails.categoryName": { $regex: category, $options: "i" } } : {}),
+          ...(brand ? { "brandDetails.brandName":  { $regex: brand, $options: "i" } } : {}),
+          ...(color ? { "colorDetails.colorName":  { $regex: color, $options: "i" } } : {}),
+          ...(minPrice || maxPrice
+            ? { price: { $gte: min, $lte: max } }
+            : {}),
+         
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      message:"Filtered products feteched successfully",
+      success:true,
+      data:filteredProducts,
+    })
+  } catch (error) {
+    next(error)
   }
 };
