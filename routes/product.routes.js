@@ -9,6 +9,8 @@ const {
   updateProduct,
   deleteProduct,
   countProducts,
+  getProductsBySearch,
+  getFilteredCategoryProducts
 } = require("../controllers/product.controller");
 
 // for admin to add the product and single image
@@ -26,13 +28,19 @@ router.patch("/:id", updateProduct);
 //Admin can remove product from db
 router.delete("/:id", deleteProduct);
 
+//for client and admin to get the product by text search
+router.get("/search", getProductsBySearch);
+
+// admin can see the total product uploaded on the dashboard
+router.get("/count", countProducts);
+
 // for client and admin to get the all products
 router.get("/", getProducts);
 
-// admin can see the total product uploaded on the dashboard
-router.get("/", countProducts);
-
 //for client and admin to get the product by id
 router.get("/:id", getProductsById);
+
+router.get('/:categoryName/filters',getFilteredCategoryProducts)
+
 
 module.exports = router;
