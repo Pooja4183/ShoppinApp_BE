@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const {getFilters} = require('../controllers/filters.controller')
+const {getDynamicFilters} = require('../controllers/dynamicFilters.controller')
 
-router.get('/', getFilters)
+router.get('/:categoryName', getDynamicFilters);
+
 
 module.exports = router;
