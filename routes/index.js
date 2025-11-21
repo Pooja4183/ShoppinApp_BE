@@ -10,7 +10,8 @@ const categoryRoutes = require('./category.routes');
 const colorRoutes = require('./color.routes');
 const brandRoutes = require('./brand.routes');
 const appCategory = require('./app-category.routes');
-const filtersRoutes = require('./filters.routes')
+const filtersRoutes = require('./allFilters.routes');
+const DynamicFiltersRoutes = require('./filters.routes')
 
 router.use('/auth', authRoutes);   // /api/auth/login
 router.use('/users', userRoutes); // /api/users/register, /profile
@@ -24,7 +25,9 @@ router.use('/category', categoryRoutes ); // this end point is to add and get th
 router.use('/brand',brandRoutes);
 router.use('/color',colorRoutes);
 router.use('/app-category',appCategory); // ths endpoint is to get the category related products 
-router.use('/filters',filtersRoutes)
+router.use('/allfilters',filtersRoutes); // get all filters
+router.use('/filters',DynamicFiltersRoutes); // get specific filters list
+
 
 
 

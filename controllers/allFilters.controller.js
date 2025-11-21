@@ -2,7 +2,7 @@ const Color = require("../models/colorModel");
 const Brand = require("../models/brandModel");
 const Gender = require("../models/categoryModel");
 
-exports.getFilters = async (req, res, next) => {
+exports.getAllfilters = async (req, res, next) => {
   try {
     const colorList = await Color.find({}, "colorName");
     const brandList = await Brand.find({}, "brandName");

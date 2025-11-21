@@ -10,8 +10,10 @@ const {
   deleteProduct,
   countProducts,
   getProductsBySearch,
-  getFilteredCategoryProducts
 } = require("../controllers/product.controller");
+const {
+  getFilteredProducts,
+} = require("../controllers/filterdProducts.controller");
 
 // for admin to add the product and single image
 //router.post("/", upload.single("image"), addProducts);
@@ -40,7 +42,6 @@ router.get("/", getProducts);
 //for client and admin to get the product by id
 router.get("/:id", getProductsById);
 
-router.get('/:categoryName/filters',getFilteredCategoryProducts)
-
+router.get("/:categoryName/filters", getFilteredProducts);
 
 module.exports = router;
