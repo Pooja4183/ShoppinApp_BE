@@ -16,7 +16,7 @@ exports.getAllfilters = async (req, res, next) => {
       { label: "₹5000 & above", min: 5000, max: 10000 },
     ];
 
-    console.log("Filter list from the db:", colorList);
+    // console.log("Filter list from the db:", colorList);
 
     // staus 200 is success msg for fetching categories
     res.status(200).json({
