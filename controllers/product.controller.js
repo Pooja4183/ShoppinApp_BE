@@ -94,7 +94,7 @@ exports.getProducts = async (req, res, next) => {
       },
     ]);
 
-    console.log("Products from the db:", products);
+    // console.log("Products from the db:", products);
 
     // staus 200 is success msg for fetching products
     res.status(200).json({
@@ -143,7 +143,10 @@ exports.getProductsById = async (req, res, next) => {
       return next(error);
     }
 
-    res.json(product);
+    res.status(200).json({
+      product:product[0],
+      success:true,
+    });
   } catch (err) {
     next(err);
   }
