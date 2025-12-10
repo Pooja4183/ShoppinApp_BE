@@ -11,11 +11,13 @@ const colorRoutes = require('./color.routes');
 const brandRoutes = require('./brand.routes');
 const appCategory = require('./app-category.routes');
 const filtersRoutes = require('./allFilters.routes');
-const DynamicFiltersRoutes = require('./filters.routes')
+const DynamicFiltersRoutes = require('./filters.routes');
+const addressRoutes = require('./address.routes');
 
 router.use('/auth', authRoutes);   // /api/auth/login
 router.use('/users', userRoutes); // /api/users/register, /profile
 router.use('/otp',otpRoutes);
+router.use('/address',addressRoutes); // users address
 router.use('/products',productRoutes);
 router.use('/admin',adminRoutes);
 
