@@ -15,7 +15,7 @@ const userAddressSchema = new mongoose.Schema(
     // Reference to User Id
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "User",
       required: true,
       index:true, // simple way to add an index
     },

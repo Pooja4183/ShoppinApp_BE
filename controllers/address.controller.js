@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const  Address = require("../models/UserAdddressModel");
+const Address = require("../models/UserAdddressModel");
 const { isValidObjectId } = require("mongoose");
 
 exports.createAddress = async (req, res, next) => {
@@ -13,10 +13,9 @@ exports.createAddress = async (req, res, next) => {
       country,
       state,
       landmark,
-    
     } = req.body;
 
-     // ✅ extract user id from JWT middleware
+    // ✅ extract user id from JWT middleware
     const userId = req.user.id;
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
@@ -46,117 +45,40 @@ exports.createAddress = async (req, res, next) => {
   }
 };
 
-exports.getAddress = async (req, res, next) => {
+exports.getAddressOfUser = async (req, res, next) => {
   try {
-    // const products = await Product.find()
-    // .populate("Category", "name slug") // only fetch name and slug
-    // .populate("Brand", "name logo")
-    // .populate("Color", "name hexCode");
+    // Extract the logged-in user's ID from the verified JWT token
+const userId = req.user._id || req.user.id;
 
-    //You can filter: Product.find({ category: 'electronics' })
+    // find all address where userID matches
+    const address = await Address.find({ userId })
+      .populate("userId", "name email")
+      .sort({ createdAt: -1 }); // optional: latest address first;
 
-    const products = await Product.aggregate([
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$categoryDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      // join the brand
-      {
-        $lookup: {
-          from: "brands",
-          localField: "brand",
-          foreignField: "_id",
-          as: "brandDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$brandDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      // join the color
-      {
-        $lookup: {
-          from: "colors",
-          localField: "color",
-          foreignField: "_id",
-          as: "colorDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$colorDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-    ]);
-
-    // console.log("Products from the db:", products);
-
-    // staus 200 is success msg for fetching products
-    res.status(200).json({
-      message: "Products fetched sussefully!",
-      success: true,
-      data: products,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.getProductsById = async (req, res, next) => {
-  const id = req.params.id;
-  if (!isValidObjectId(id)) {
-    return res.status(400).json({
-      message: "Invalid product ID",
-      success: false,
-    });
-  }
-
-  try {
-    //findById is a shortcut for findOne({ _id: req.params.id }).
-    // const product = await Product.findById(req.params.id);
-    const product = await Product.aggregate([
-      {
-        $match: {
-          _id: new mongoose.Types.ObjectId(id),
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true },
-      },
-    ]);
-    if (!product.length) {
-      const error = new Error("Product not found");
-      error.statusCode = 404;
-      return next(error);
+    //if no address found
+    if (!address.length) {
+      return res.status(200).json({
+        message: "No address found for this user.",
+        success: true,
+        data: [],
+      });
     }
 
+    // send the address
     res.status(200).json({
-      product: product[0],
+      message: "Address fetched successfully.",
       success: true,
+      data: address,
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.log("Error fetching address by ID", error);
+  res.status(500).json({
+    message:"Server error while fetching addresses.",
+    success:false,
+    error:error.message,
+  })
+
+    next(error);
   }
 };
 
