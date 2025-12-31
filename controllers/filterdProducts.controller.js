@@ -1,4 +1,4 @@
-const Product = require("../models/productModel");
+const Product = require("../models/product.model");
 
 exports.getFilteredProducts = async (req, res, next) => {
   try {

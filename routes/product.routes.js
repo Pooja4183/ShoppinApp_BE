@@ -10,7 +10,7 @@ const {
   deleteProduct,
   countProducts,
   getProductsBySearch,
-} = require("../controllers/product.controller");
+} = require("../controllers/products/product.controller");
 const {
   getFilteredProducts,
 } = require("../controllers/filterdProducts.controller");

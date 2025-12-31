@@ -1,5 +1,5 @@
-const User = require("../models/User");
-const Otp = require("../models/OtpModel");
+const User = require("../models/user.model");
+const Otp = require("../models/otp.model");
 
 // Verify OTP
 exports.verifyOTP = async (req, res) => {

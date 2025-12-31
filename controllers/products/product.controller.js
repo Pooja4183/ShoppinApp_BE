@@ -1,32 +1,18 @@
 const { default: mongoose } = require("mongoose");
-const Product = require("../models/productModel");
+const Product = require("../../models/product.model");
 const { isValidObjectId } = require("mongoose");
+const {fetchProducts, createProduct} = require('../../services/product.service');
+//const productService = require('../services/product.service');
+const {ProductDto} = require('./product.dto');
 
 exports.addProducts = async (req, res, next) => {
   try {
     const { title, description, price, category, brand, color } = req.body;
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-
-    // 3. Create new user
-    const newProduct = new Product({
-      title,
-      description,
-      price,
-      category,
-      brand,
-      color,
-      //image:req.file ? req.file.filename:null, // multer add req.file for single image
-      images: req.files
-        ? req.files.map((file) => ({
-            original: file.originalname,
-            saved: file.filename,
-            url: `${baseUrl}/uploads/${file.filename}`,
-          }))
-        : [], // <-- full path here
-    });
-    await newProduct.save();
-
+    const files = req.files;
+    const productDto = {title, description, price, category, brand, color, baseUrl, files};
+    createProduct(productDto);
     // 5. Response 201 code is for creating
     res.status(201).json({
       message: "Product added successfully.",
@@ -40,68 +26,17 @@ exports.addProducts = async (req, res, next) => {
 
 exports.getProducts = async (req, res, next) => {
   try {
-    // const products = await Product.find()
-    // .populate("Category", "name slug") // only fetch name and slug
-    // .populate("Brand", "name logo")
-    // .populate("Color", "name hexCode");
-
-    //You can filter: Product.find({ category: 'electronics' })
-
-    const products = await Product.aggregate([
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$categoryDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      // join the brand
-      {
-        $lookup: {
-          from: "brands",
-          localField: "brand",
-          foreignField: "_id",
-          as: "brandDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$brandDetails",
-          preserveNullAndEmptyArrays: true, 
-        },
-      },
-      // join the color
-      {
-        $lookup: {
-          from: "colors",
-          localField: "color",
-          foreignField: "_id",
-          as: "colorDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$colorDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-    ]);
-
-    // console.log("Products from the db:", products);
-
+    const products = await fetchProducts();
+   // const pro = productService.fetchProducts();
     // staus 200 is success msg for fetching products
     res.status(200).json({
       message: "Products fetched sussefully!",
       success: true,
       data: products,
+     
+      
     });
+    console.log("from product response:",products)
   } catch (err) {
     next(err);
   }

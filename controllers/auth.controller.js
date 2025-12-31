@@ -1,8 +1,6 @@
-const User = require("../models/User");
+const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-
-
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body; // object destructuring
@@ -20,7 +18,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
         {id:user._id, email:user.email, name:user.name},
         process.env.JWT_SECRET,
-        {expiresIn:"7d"}
+        {expiresIn:"15d"}
     );
     // 4. send token + user info (exluding password)
     res.status(200).json({
