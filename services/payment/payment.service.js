@@ -17,10 +17,16 @@ exports.initiatePayment = async ({ amount, orderId }) => {
 };
 
 exports.markPaymentSuccess = async (razorpayOrderId) => {
-  await payment.updateOne({ razorpayOrderId }, { status: SUCCESS });
+  return await payment.updateOne(
+    { razorpayOrderId, status: "CREATED" },
+    { status: "SUCCESS", paidAt: new Date() }
+  );
 };
 
 exports.markPaymentFailed = async (razorpayOrderId) => {
-  await payment.updateOne({ razorpayOrderId }, { status: SUCCESS });
+  return await payment.updateOne({ razorpayOrderId }, { status: "FAILED" });
+};
 
+exports.getPaymentByRazorpayOrderId = async (razorpayOrderId) => {
+  return await payment.findOne({ razorpayOrderId });
 };

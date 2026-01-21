@@ -20,3 +20,8 @@ exports.placeOrder = async (req, res, next) => {
     });
   }
 };
+
+exports.getOrder = async (req,res,next)=>{
+  
+}
+

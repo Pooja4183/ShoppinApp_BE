@@ -1,11 +1,6 @@
 const Order = require("../models/order.model");
 
-exports.createOrder = async ({
-  userId,
-  addressId,
-  items,
-  totalAmount,
-}) => {
+exports.createOrder = async ({ userId, addressId, items, totalAmount }) => {
   const newOrder = await Order.create({
     status: "PENDING",
     userId,
@@ -15,4 +10,9 @@ exports.createOrder = async ({
   });
 
   return newOrder;
+};
+
+exports.markOrderPaid = async (orderId ) => {
+  await Order.updateOne({ _id: orderId }, { status: "CONFIRMED" ,confirmedAt: new Date()});
+  console.log("Confirming order");
 };

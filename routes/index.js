@@ -25,7 +25,7 @@ router.use('/products',productRoutes);
 router.use('/admin',adminRoutes);
 router.use('/order',orderRoutes);
 router.use('/payment',paymentRoutes);
-router.use('/razorpay',razorpayRoutes);
+router.use('/webhook',razorpayRoutes);
 //new routes for product category, brand and color
 
 router.use('/category', categoryRoutes ); // this end point is to add and get the category from the admin panel

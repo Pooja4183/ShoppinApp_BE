@@ -36,7 +36,7 @@ exports.getProducts = async (req, res, next) => {
      
       
     });
-    console.log("from product response:",products)
+  
   } catch (err) {
     next(err);
   }
