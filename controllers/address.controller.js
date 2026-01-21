@@ -1,5 +1,5 @@
 const { default: mongoose } = require("mongoose");
-const Address = require("../models/UserAdddressModel");
+const Address = require("../models/user-adddress.model");
 const { isValidObjectId } = require("mongoose");
 
 exports.createAddress = async (req, res, next) => {

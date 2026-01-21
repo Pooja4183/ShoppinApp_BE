@@ -1,4 +1,4 @@
-const Otp = require("../models/OtpModel");
+const Otp = require("../models/otp.model");
 const randomString = require("randomstring");
 const sendEmail = require("../utils/sendEmails");
 
