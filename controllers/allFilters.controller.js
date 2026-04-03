@@ -1,6 +1,6 @@
-const Color = require("../models/colorModel");
-const Brand = require("../models/brandModel");
-const Gender = require("../models/categoryModel");
+const Color = require("../models/color.model");
+const Brand = require("../models/brand.model");
+const Gender = require("../models/category.model");
 
 exports.getAllfilters = async (req, res, next) => {
   try {

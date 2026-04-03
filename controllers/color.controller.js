@@ -1,4 +1,4 @@
-const Color = require("../models/colorModel");
+const Color = require("../models/color.model");
 
 exports.createColor = async (req, res, next) => {
   try {

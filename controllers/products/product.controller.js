@@ -1,32 +1,31 @@
 const { default: mongoose } = require("mongoose");
-const Product = require("../models/productModel");
+const Product = require("../../models/product.model");
 const { isValidObjectId } = require("mongoose");
+const {
+  fetchProducts,
+  createProduct,
+} = require("../../services/product.service");
+//const productService = require('../services/product.service');
+const { ProductDto } = require("./product.dto");
 
 exports.addProducts = async (req, res, next) => {
   try {
     const { title, description, price, category, brand, color } = req.body;
 
     const baseUrl = `${req.protocol}://${req.get("host")}`;
-
-    // 3. Create new user
-    const newProduct = new Product({
+    const files = req.files;
+    const productDto = {
       title,
       description,
       price,
       category,
       brand,
       color,
-      //image:req.file ? req.file.filename:null, // multer add req.file for single image
-      images: req.files
-        ? req.files.map((file) => ({
-            original: file.originalname,
-            saved: file.filename,
-            url: `${baseUrl}/uploads/${file.filename}`,
-          }))
-        : [], // <-- full path here
-    });
-    await newProduct.save();
+      baseUrl,
+      files,
+    };
 
+    const newProduct = await createProduct(productDto);
     // 5. Response 201 code is for creating
     res.status(201).json({
       message: "Product added successfully.",
@@ -40,67 +39,13 @@ exports.addProducts = async (req, res, next) => {
 
 exports.getProducts = async (req, res, next) => {
   try {
-    // const products = await Product.find()
-    // .populate("Category", "name slug") // only fetch name and slug
-    // .populate("Brand", "name logo")
-    // .populate("Color", "name hexCode");
+    const result = await fetchProducts(req.query);
 
-    //You can filter: Product.find({ category: 'electronics' })
-
-    const products = await Product.aggregate([
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$categoryDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      // join the brand
-      {
-        $lookup: {
-          from: "brands",
-          localField: "brand",
-          foreignField: "_id",
-          as: "brandDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$brandDetails",
-          preserveNullAndEmptyArrays: true, 
-        },
-      },
-      // join the color
-      {
-        $lookup: {
-          from: "colors",
-          localField: "color",
-          foreignField: "_id",
-          as: "colorDetails",
-        },
-      },
-      {
-        $unwind: {
-          path: "$colorDetails",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-    ]);
-
-    // console.log("Products from the db:", products);
-
-    // staus 200 is success msg for fetching products
     res.status(200).json({
-      message: "Products fetched sussefully!",
+      message: "Products fetched successfully!",
       success: true,
-      data: products,
+      data: result.products,
+      pagination: result.pagination,
     });
   } catch (err) {
     next(err);
@@ -144,8 +89,8 @@ exports.getProductsById = async (req, res, next) => {
     }
 
     res.status(200).json({
-      product:product[0],
-      success:true,
+      product: product[0],
+      success: true,
     });
   } catch (err) {
     next(err);
@@ -158,7 +103,7 @@ exports.replaceProduct = async (req, res, next) => {
     const updated = await Product.findOneAndUpdate(
       { _id: req.params.id },
       req.body,
-      { new: true, overwrite: true, runValidators: true }
+      { new: true, overwrite: true, runValidators: true },
     ); // overwrite replaces doc
 
     if (!updated) {
@@ -178,7 +123,7 @@ exports.updateProduct = async (req, res, next) => {
       req.params.id,
       req.body,
       { $set: req.body }, // only update provided fields
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updated) {
@@ -226,28 +171,3 @@ exports.checkProductExists = async (req, res, next) => {
     next(error);
   }
 };
-
-// get product by search querry
-exports.getProductsBySearch = async (req, res, next) => {
-  const { query } = req.query; // // Get search query from URL parameter (only value )
-  if (!query) {
-    return res
-      .status(400)
-      .json({ message: "Search query is required", success: false });
-  }
-  try {
-    const data = await Product.find({
-      // Case-insensitive search on 'name' field
-      $or: [
-        { title: { $regex: query, $options: "i" } },
-        { description: { $regex: query, $options: "i" } },
-      ],
-    });
-    res.status(200).json({ success: true, data });
-  } catch (error) {
-    next(error);
-  }
-};
-
-//
-
