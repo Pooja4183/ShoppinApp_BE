@@ -21,18 +21,20 @@ router.use('/auth', authRoutes);   // /api/auth/login
 router.use('/users', userRoutes); // /api/users/register, /profile
 router.use('/otp',otpRoutes);
 router.use('/address',addressRoutes); // users address
-router.use('/products',productRoutes);
 router.use('/admin',adminRoutes);
 router.use('/order',orderRoutes);
 router.use('/payment',paymentRoutes);
 router.use('/webhook',razorpayRoutes);
-//new routes for product category, brand and color
 
-router.use('/category', categoryRoutes ); // this end point is to add and get the category from the admin panel
-router.use('/brand',brandRoutes);
-router.use('/color',colorRoutes);
-router.use('/app-category',appCategory); // ths endpoint is to get the category related products 
-router.use('/allfilters',filtersRoutes); // get all filters
-router.use('/filters',DynamicFiltersRoutes); // get specific filters list
+//routes for product, category, brand and color
+router.use('/products',productRoutes); // for all products
+router.use('/app-category',appCategory); // ths endpoint is category related products 
+router.use('/allfilters',filtersRoutes); // for all filters
+router.use('/filters',DynamicFiltersRoutes); // for specific filters list
+
+router.use('/category', categoryRoutes ); // this end point is to add category from the admin panel
+router.use('/brand',brandRoutes); // this end point is to add brands from the admin panel
+router.use('/color',colorRoutes); // this end point is to add colors from the admin panel
+
 
 module.exports = router;

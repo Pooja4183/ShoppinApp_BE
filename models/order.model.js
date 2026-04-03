@@ -13,6 +13,7 @@ const orderSchema = new mongoose.Schema(
       ref: "Address",
       required: true,
     },
+
     items: [
       {
         productId: {
@@ -20,14 +21,34 @@ const orderSchema = new mongoose.Schema(
           ref: "Product",
           required: true,
         },
-        quantity: {
-          type: Number,
+
+        // snapshot fields (stored at order time)
+        title: {
+          type: String,
+          required: true,
+        },
+
+        image: {
+          type: String,
           required: true,
         },
 
         price: {
           type: Number,
           required: true,
+        },
+
+        quantity: {
+          type: Number,
+          required: true,
+        },
+
+        size: {
+          type: String,
+        },
+
+        color: {
+          type: String,
         },
       },
     ],
@@ -39,7 +60,7 @@ const orderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["PENDING", "CONFIRMED", "CANCELLED"],
+      enum: ["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"],
       default: "PENDING",
     },
   },
