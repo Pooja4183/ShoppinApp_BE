@@ -9,11 +9,7 @@ const {
   updateProduct,
   deleteProduct,
   countProducts,
-  getProductsBySearch,
 } = require("../controllers/products/product.controller");
-const {
-  getFilteredProducts,
-} = require("../controllers/filterdProducts.controller");
 
 // for admin to add the product and single image
 //router.post("/", upload.single("image"), addProducts);
@@ -30,18 +26,24 @@ router.patch("/:id", updateProduct);
 //Admin can remove product from db
 router.delete("/:id", deleteProduct);
 
-//for client and admin to get the product by text search
-router.get("/search", getProductsBySearch);
-
-// admin can see the total product uploaded on the dashboard
+// ✅ Total product count
+// WHY: Used in admin dashboard (stats, analytics)
 router.get("/count", countProducts);
 
-// for client and admin to get the all products
+// ==========================
+// 🔹 PRODUCT LISTING (CORE API)
+// ==========================
+
+// ✅ MAIN LISTING API
+// Handles:
+// - category
+// - search
+// - filters (brand, color, price, rating)
+// - sorting
+// - pagination
 router.get("/", getProducts);
 
 //for client and admin to get the product by id
 router.get("/:id", getProductsById);
-
-router.get("/:categoryName/filters", getFilteredProducts);
 
 module.exports = router;

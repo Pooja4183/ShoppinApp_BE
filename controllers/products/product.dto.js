@@ -1,17 +1,14 @@
-exports.ProductDto = (
-  title,
-  description,
-  price,
-  category,
-  brand,
-  color,
-  baseUrl
-) => {
-  this.title = title;
-  this.description = description;
-  this.price = price;
-  this.category = category;
-  this.brand = brand;
-  this.color = color;
-  this.baseUrl = baseUrl;
-};
+class ProductDto {
+  constructor(data) {
+    this.title = data.title;
+    this.description = data.description;
+    this.price = data.price;
+    this.category = data.category;
+    this.brand = data.brand;
+    this.color = data.color;
+    this.baseUrl = data.baseUrl;
+    this.files = data.files; // important for images
+  }
+}
+
+module.exports = { ProductDto };

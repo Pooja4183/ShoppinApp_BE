@@ -1,6 +1,10 @@
 const { default: mongoose } = require("mongoose");
 const Address = require("../models/user-adddress.model");
 const { isValidObjectId } = require("mongoose");
+const {
+ fetchUserAddress
+
+} = require("../services/address.service");
 
 exports.createAddress = async (req, res, next) => {
   try {
@@ -45,6 +49,27 @@ exports.createAddress = async (req, res, next) => {
   }
 };
 
+// get address list of logged in user
+
+exports.getMyAddress = async (req, res, next) => {
+
+  try {
+    const getuserAddress = await fetchUserAddress();
+
+    res.status(200).json({
+      message: "address feched successfully",
+      data: getuserAddress,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      message: "failed to fetch address",
+    });
+  }
+};
+
+
+// get adress of all users 
 exports.getAddressOfUser = async (req, res, next) => {
   try {
     // Extract the logged-in user's ID from the verified JWT token
@@ -102,9 +127,9 @@ exports.replaceProduct = async (req, res, next) => {
 };
 // update partial field
 
-exports.updateProduct = async (req, res, next) => {
+exports.updateAddress = async (req, res, next) => {
   try {
-    const updated = await Product.findByIdAndUpdate(
+    const updated = await Address.findByIdAndUpdate(
       req.params.id,
       req.body,
       { $set: req.body }, // only update provided fields
